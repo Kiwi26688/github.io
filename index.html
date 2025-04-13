@@ -3,78 +3,577 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Slot Machine Webgame</title>
+  <title>Casino Spieleplattform</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom, #222, #444);
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to bottom, #000000, #333333);
       color: #fff;
       text-align: center;
       margin: 0;
       padding: 0;
+      overflow-x: hidden;
     }
-    .container {
-      max-width: 500px;
-      margin: 50px auto;
+    
+    .navbar {
+      background-color: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .navbar .logo {
+      font-size: 24px;
+      color: gold;
+    }
+    
+    .navbar .menu a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+    }
+    
+    .game-container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: rgba(0, 0, 0, 0.7);
+      border: 5px solid gold;
+      border-radius: 15px;
       padding: 20px;
-      background: #111;
-      border: 8px solid #888;
-      border-radius: 20px;
-      box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
     }
-    h1 {
+    
+    .game-title {
       font-size: 2.5em;
-      margin-bottom: 10px;
-      color: #ffd700;
+      color: gold;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+      margin-bottom: 20px;
     }
-    .reels {
+    
+    .slot-machine {
       display: flex;
       justify-content: center;
-      margin: 20px 0;
+      align-items: center;
+      padding: 20px;
     }
+    
     .reel {
-      width: 60px;
-      height: 60px;
+      width: 100px;
+      height: 100px;
       margin: 0 10px;
-      font-size: 2.5em;
-      background: #fff;
-      color: #000;
+      font-size: 3em;
+      background: white;
+      color: black;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 10px;
+      overflow: hidden;
+      position: relative;
     }
-    .spin-btn {
-      margin-top: 20px;
-      padding: 10px 30px;
-      font-size: 1.2em;
-      background-color: #ffd700;
-      color: #000;
-      border: none;
-      border-radius: 10px;
+    
+    .reel-container {
+      position: relative;
+      height: 100px;
     }
-    .spin-btn:hover {
-      background-color: #e6c200; /* Hover-Effekt */
+    
+    .reel-strip {
+      position: absolute;
+      transition: top 1s ease-in-out;
+      top: 0;
     }
-    .shop-btn {
-      margin-top: 20px;
-      padding: 10px;
-      font-size: 1.2em;
-      background-color: #28a745;
-      color: white;
-      border-radius: 10px;
-    }
-    .shop-btn:hover {
-      background-color: #218838; /* Hover-Effekt */
-    }
-    .info {
-      margin-top: 20px;
-    }
-    .game-mode {
+    
+    .reel-item {
+      width: 100px;
+      height: 100px;
       display: flex;
-      justify-content: space-around;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .controls {
       margin-top: 30px;
     }
-    .game-mode div {
+    
+    .btn {
+      padding: 12px 30px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 50px;
+      margin: 0 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-spin {
+      background: linear-gradient(to bottom, #ffd700, #b8860b);
+      color: black;
+      font-weight: bold;
+      box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+    }
+    
+    .btn-spin:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(255, 215, 0, 0.6);
+    }
+    
+    .btn-shop {
+      background: linear-gradient(to bottom, #28a745, #1e7e34);
+      color: white;
+    }
+    
+    .btn-shop:hover {
+      transform: scale(1.05);
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+      font-size: 1.2em;
+    }
+    
+    .stats div {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px 20px;
+      border-radius: 50px;
+    }
+    
+    .game-modes {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    
+    .game-mode {
+      padding: 10px 20px;
+      margin: 0 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .game-mode:hover, .game-mode.active {
+      background: gold;
+      color: black;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 100;
+    }
+    
+    .modal-content {
+      background: #222;
+      border: 3px solid gold;
+      border-radius: 15px;
+      width: 80%;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    
+    .shop-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding: 15px;
-      background-color:#444;
+      margin: 10px 0;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+    }
+    
+    .close-btn {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    
+    .game-selector {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    
+    .game-option {
+      margin: 0 10px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .game-option:hover {
+      background: gold;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <div class="navbar">
+    <div class="logo">🎰 CasinoHub</div>
+    <div class="menu">
+      <a href="#" onclick="switchGame('slots')">Slots</a>
+      <a href="#" onclick="switchGame('wheel')">Glücksrad</a>
+      <a href="#" onclick="switchGame('poker')">Poker</a>
+      <a href="#" onclick="openLeaderboard()">Bestenliste</a>
+      <a href="#" id="loginBtn">Anmelden</a>
+    </div>
+  </div>
+
+  <!-- Main Game Container -->
+  <div class="game-container" id="gameArea">
+    <div class="game-title">Slot Machine</div>
+    
+    <!-- Stats Display -->
+    <div class="stats">
+      <div>Punkte: <span id="points">1000</span></div>
+      <div>Glücksbonus: <span id="luckBonus">0</span>%</div>
+    </div>
+    
+    <!-- Game Mode Selector -->
+    <div class="game-modes">
+      <div class="game-mode active" onclick="setGameMode('normal')">Normal</div>
+      <div class="game-mode" onclick="setGameMode('jackpot')">Jackpot</div>
+      <div class="game-mode" onclick="setGameMode('bonus')">Bonus</div>
+    </div>
+    
+    <!-- Slot Machine -->
+    <div class="slot-machine">
+      <div class="reel-container">
+        <div class="reel" id="reel1">🍒</div>
+      </div>
+      <div class="reel-container">
+        <div class="reel" id="reel2">🍋</div>
+      </div>
+      <div class="reel-container">
+        <div class="reel" id="reel3">🔔</div>
+      </div>
+    </div>
+    
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn btn-spin" onclick="spin()">SPIN</button>
+      <button class="btn btn-shop" onclick="openShop()">Shop</button>
+    </div>
+  </div>
+
+  <!-- Shop Modal -->
+  <div id="shopModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeShop()">✖</span>
+      <h2 style="color: gold;">Shop</h2>
+      
+      <div class="shop-item">
+        <div>Glücksbonus +10%</div>
+        <div>100 Punkte</div>
+        <button class="btn" onclick="buyItem('luck', 10, 100)">Kaufen</button>
+      </div>
+      
+      <div class="shop-item">
+        <div>Glücksbonus +20%</div>
+        <div>200 Punkte</div>
+        <button class="btn" onclick="buyItem('luck', 20, 200)">Kaufen</button>
+      </div>
+      
+      <div class="shop-item">
+        <div>Premium Design</div>
+        <div>300 Punkte</div>
+        <button class="btn" onclick="buyItem('design', 1, 300)">Kaufen</button>
+      </div>
+      
+      <div class="shop-item">
+        <div>Game Pass</div>
+        <div>500 Punkte</div>
+        <button class="btn" onclick="buyItem('pass', 1, 500)">Kaufen</button>
+      </div>
+      
+      <div style="margin-top: 20px; border-top: 1px solid gray; padding-top: 20px;">
+        <button class="btn" onclick="openPayPal()">Mit PayPal aufladen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sounds -->
+  <audio id="spinSound" src="https://www.soundjay.com/mechanical/sounds/slot-machine-3.mp3" preload="auto"></audio>
+  <audio id="winSound" src="https://www.soundjay.com/mechanical/sounds/slot-machine-6.mp3" preload="auto"></audio>
+  <audio id="jackpotSound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" preload="auto"></audio>
+  <audio id="bgMusic" src="https://www.soundjay.com/free-music/sounds/upbeat-fun-02.mp3" preload="auto" loop></audio>
+
+  <script>
+    // Game Variables
+    let points = 1000;
+    let luckBonus = 0;
+    let currentGameMode = 'normal';
+    let currentGame = 'slots';
+    let hasGamePass = false;
+    let hasPremiumDesign = false;
+    
+    // Symbols and their base values
+    const symbols = [
+      { emoji: "🍒", value: 10 },
+      { emoji: "🍋", value: 20 },
+      { emoji: "🔔", value: 30 },
+      { emoji: "🍀", value: 40 },
+      { emoji: "💎", value: 50 }
+    ];
+    
+    // Initialize game
+    document.addEventListener('DOMContentLoaded', function() {
+      updatePoints();
+      updateLuckBonus();
+      
+      // Start background music when user interacts
+      document.body.addEventListener('click', function() {
+        document.getElementById('bgMusic').play();
+      }, { once: true });
+    });
+    
+    // Play sound
+    function playSound(id) {
+      const sound = document.getElementById(id);
+      sound.currentTime = 0;
+      sound.play();
+    }
+    
+    // Spin the slot machine
+    function spin() {
+      // Check if player has enough points
+      if (points < 10) {
+        alert("Nicht genug Punkte!");
+        return;
+      }
+      
+      // Deduct points (cost to spin)
+      points -= 10;
+      updatePoints();
+      
+      // Play spin sound
+      playSound('spinSound');
+      
+      // Animate reels
+      animateReels();
+      
+      // Calculate results after animation finishes
+      setTimeout(calculateResults, 1000);
+    }
+    
+    // Animate reels
+    function animateReels() {
+      const reels = [
+        document.getElementById('reel1'),
+        document.getElementById('reel2'),
+        document.getElementById('reel3')
+      ];
+      
+      // Simple animation - random symbols during animation
+      let animationInterval = setInterval(function() {
+        reels.forEach(reel => {
+          const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+          reel.textContent = randomSymbol.emoji;
+        });
+      }, 100);
+      
+      // Stop animation after 1 second
+      setTimeout(function() {
+        clearInterval(animationInterval);
+      }, 1000);
+    }
+    
+    // Calculate results of the spin
+    function calculateResults() {
+      // Apply luck bonus if any
+      const effectiveLuck = luckBonus / 100; // Convert percentage to decimal
+      
+      // Get random results for each reel
+      let results = [];
+      for (let i = 0; i < 3; i++) {
+        // The higher the luck bonus, the more likely to get higher value symbols
+        let randomIndex;
+        if (Math.random() < effectiveLuck) {
+          // Higher chance for better symbols with luck bonus
+          randomIndex = Math.min(
+            Math.floor(Math.random() * symbols.length + effectiveLuck * 2),
+            symbols.length - 1
+          );
+        } else {
+          randomIndex = Math.floor(Math.random() * symbols.length);
+        }
+        results.push(symbols[randomIndex]);
+      }
+      
+      // Display results
+      document.getElementById('reel1').textContent = results[0].emoji;
+      document.getElementById('reel2').textContent = results[1].emoji;
+      document.getElementById('reel3').textContent = results[2].emoji;
+      
+      // Check for wins
+      checkForWins(results);
+    }
+    
+    // Check for winning combinations
+    function checkForWins(results) {
+      // Three of a kind
+      if (results[0].emoji === results[1].emoji && results[1].emoji === results[2].emoji) {
+        // Jackpot! Base value × 10
+        const baseValue = results[0].value;
+        const winAmount = baseValue * 10;
+        
+        // Bonus for Jackpot mode
+        let finalWinAmount = currentGameMode === 'jackpot' ? winAmount * 2 : winAmount;
+        
+        // Game pass bonus
+        if (hasGamePass) finalWinAmount = Math.floor(finalWinAmount * 1.2);
+        
+        points += finalWinAmount;
+        playSound('jackpotSound');
+        
+        // Show win message
+        alert(`JACKPOT! Du hast ${finalWinAmount} Punkte gewonnen!`);
+      } 
+      // Two of a kind
+      else if (
+        results[0].emoji === results[1].emoji || 
+        results[1].emoji === results[2].emoji || 
+        results[0].emoji === results[2].emoji
+      ) {
+        // Calculate which symbols matched
+        let matchedSymbol;
+        if (results[0].emoji === results[1].emoji) matchedSymbol = results[0];
+        else if (results[1].emoji === results[2].emoji) matchedSymbol = results[1];
+        else matchedSymbol = results[0];
+        
+        // Win is base value × 2
+        let winAmount = matchedSymbol.value * 2;
+        
+        // Bonus for Bonus mode
+        if (currentGameMode === 'bonus') winAmount = Math.floor(winAmount * 1.5);
+        
+        // Game pass bonus
+        if (hasGamePass) winAmount = Math.floor(winAmount * 1.2);
+        
+        points += winAmount;
+        playSound('winSound');
+        
+        // Show win message
+        alert(`Kleiner Gewinn! ${winAmount} Punkte.`);
+      }
+      
+      updatePoints();
+    }
+    
+    // Update points display
+    function updatePoints() {
+      document.getElementById('points').textContent = points;
+    }
+    
+    // Update luck bonus display
+    function updateLuckBonus() {
+      document.getElementById('luckBonus').textContent = luckBonus;
+    }
+    
+    // Set game mode
+    function setGameMode(mode) {
+      currentGameMode = mode;
+      
+      // Update UI to show active mode
+      const modes = document.querySelectorAll('.game-mode');
+      modes.forEach(modeElement => {
+        if (modeElement.textContent.toLowerCase() === mode) {
+          modeElement.classList.add('active');
+        } else {
+          modeElement.classList.remove('active');
+        }
+      });
+    }
+    
+    // Open shop
+    function openShop() {
+      document.getElementById('shopModal').style.display = 'block';
+    }
+    
+    // Close shop
+    function closeShop() {
+      document.getElementById('shopModal').style.display = 'none';
+    }
+    
+    // Buy item from shop
+    function buyItem(type, amount, cost) {
+      if (points < cost) {
+        alert("Nicht genug Punkte!");
+        return;
+      }
+      
+      points -= cost;
+      
+      switch(type) {
+        case 'luck':
+          luckBonus += amount;
+          updateLuckBonus();
+          alert(`Glücksbonus um ${amount}% erhöht!`);
+          break;
+        case 'design':
+          hasPremiumDesign = true;
+          document.body.style.background = "linear-gradient(to bottom, #000000, #4B0082)";
+          document.querySelector('.game-container').style.boxShadow = "0 0 50px rgba(255, 0, 255, 0.5)";
+          alert("Premium Design freigeschaltet!");
+          break;
+        case 'pass':
+          hasGamePass = true;
+          alert("Game Pass aktiviert! Du erhältst 20% mehr Gewinne.");
+          break;
+      }
+      
+      updatePoints();
+    }
+    
+    // Open PayPal (placeholder)
+    function openPayPal() {
+      alert("PayPal-Integration würde hier erfolgen. In einer echten Anwendung würde dies zu einer sicheren Zahlungsseite führen.");
+    }
+    
+    // Switch between games (placeholder)
+    function switchGame(game) {
+      currentGame = game;
+      
+      // Update game UI based on selected game (simplified for example)
+      const gameTitle = document.querySelector('.game-title');
+      
+      switch(game) {
+        case 'slots':
+          gameTitle.textContent = "Slot Machine";
+          break;
+        case 'wheel':
+          gameTitle.textContent = "Glücksrad";
+          alert("Glücksrad-Spiel würde hier geladen. In einer vollständigen Anwendung würde eine andere Spieloberfläche angezeigt.");
+          break;
+        case 'poker':
+          gameTitle.textContent = "Poker";
+          alert("Poker-Spiel würde hier geladen. In einer vollständigen Anwendung würde eine andere Spieloberfläche mit NPC-Gegnern angezeigt.");
+          break;
+      }
+    }
+    
+    // Open leaderboard (placeholder)
+    function openLeaderboard() {
+      alert("Bestenliste würde hier angezeigt. In einer vollständigen Anwendung würde eine Liste der Top-Spieler aus einer Datenbank geladen.");
+    }
+    
+    // Login functionality (placeholder)
+    document.getElementById('loginBtn').addEventListener('click', function() {
+      alert("Google-Login würde hier integriert. In einer vollständigen Anwendung würde OAuth für sicheres Einloggen verwendet.");
+    });
+  </script>
+</body>
+</html>
