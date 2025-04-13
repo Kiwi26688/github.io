@@ -1,0 +1,10 @@
+<audio id="spinSound" src="media/slot-machine-3.mp3" preload="auto"></audio>
+<script>
+  function playSound(id) {
+    const sound = document.getElementById(id);
+    sound.currentTime = 0;
+    sound.play().catch(error => {
+      console.error("Fehler beim Abspielen des Sounds:", error);
+    });
+  }
+</script>
