@@ -2,23 +2,39 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Slotmaschine</title>
+    <title>Slotmaschine Deluxe mit Speicher</title>
     <style>
         body {
             text-align: center;
-            font-family: Arial, sans-serif;
-            background: #111;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(#222, #000);
             color: #fff;
+            margin: 0;
+            padding: 0;
         }
+
         h1 {
             margin-top: 40px;
         }
+
+        .machine {
+            background: #333;
+            border: 10px solid #888;
+            border-radius: 20px;
+            width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            box-shadow: 0 0 20px #000;
+            position: relative;
+        }
+
         .slot-container {
             display: flex;
             justify-content: center;
-            margin: 50px auto;
-            gap: 20px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
+
         .slot {
             width: 80px;
             height: 80px;
@@ -28,72 +44,149 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #222;
+            background: #111;
             transition: transform 0.1s;
         }
+
         .spinning {
             animation: spin 0.1s infinite;
         }
+
         @keyframes spin {
             0% { transform: rotateX(0deg); }
             50% { transform: rotateX(180deg); }
             100% { transform: rotateX(360deg); }
         }
-        button {
-            margin-top: 30px;
-            padding: 10px 20px;
-            font-size: 18px;
+
+        .lever {
+            width: 30px;
+            height: 100px;
+            background: #f00;
+            border-radius: 10px;
+            margin: 0 auto 10px;
             cursor: pointer;
+            transition: transform 0.2s;
         }
+
+        .lever:active {
+            transform: rotate(20deg);
+        }
+
+        button {
+            margin: 10px 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #f90;
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #fb0;
+        }
+
         #jackpot {
-            margin-top: 30px;
-            font-size: 24px;
+            font-size: 22px;
             color: gold;
-            height: 30px;
+            margin: 10px;
+            min-height: 28px;
         }
+
+        .jackpot-blink {
+            animation: blink 0.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { color: gold; }
+            50% { color: red; }
+        }
+
+        .scoreboard {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #0f0;
+        }
+
     </style>
 </head>
 <body>
-    <h1>🎰 Willkommen bei meiner Slotmaschine 🎰</h1>
-    <div class="slot-container">
-        <div class="slot" id="slot1">🍒</div>
-        <div class="slot" id="slot2">🍋</div>
-        <div class="slot" id="slot3">🍉</div>
-    </div>
-    <button onclick="startSlot()">Drehen</button>
-    <div id="jackpot"></div>
+    <h1>🎰 Deluxe Slotmaschine 🎰</h1>
 
-    <!-- Sounds -->
-    <audio id="spinSound" src="https://www.myinstants.com/media/sounds/slot-machine.mp3"></audio>
-    <audio id="jackpotSound" src="https://www.myinstants.com/media/sounds/tada-fanfare.mp3"></audio>
+    <div class="machine">
+        <div class="slot-container">
+            <div class="slot" id="slot1">🍒</div>
+            <div class="slot" id="slot2">🍋</div>
+            <div class="slot" id="slot3">🍉</div>
+        </div>
+
+        <div class="lever" onclick="startSlot()"></div>
+
+        <button onclick="buyPoints()">Punkte kaufen (+50)</button>
+
+        <div id="jackpot"></div>
+        <div class="scoreboard">Punkte: <span id="points">0</span></div>
+    </div>
+
+    <!-- Sounds mit zuverlässiger Quelle -->
+    <audio id="spinSound" src="https://cdn.pixabay.com/audio/2023/03/22/audio_aa1702e6a1.mp3"></audio>
+    <audio id="jackpotSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_7750cc1f16.mp3"></audio>
 
     <script>
         const symbols = ["🍒", "🍋", "🍉", "🍇", "🔔", "⭐", "7️⃣"];
-        let slots = [
+        const slots = [
             document.getElementById("slot1"),
             document.getElementById("slot2"),
             document.getElementById("slot3")
         ];
-        let jackpotText = document.getElementById("jackpot");
-
+        const jackpotText = document.getElementById("jackpot");
+        const pointsDisplay = document.getElementById("points");
         const spinSound = document.getElementById("spinSound");
         const jackpotSound = document.getElementById("jackpotSound");
+
+        let points = parseInt(localStorage.getItem("slotPoints")) || 100;
+
+        updatePointsDisplay();
+
+        function savePoints() {
+            localStorage.setItem("slotPoints", points);
+        }
+
+        function updatePointsDisplay() {
+            pointsDisplay.textContent = points;
+        }
+
+        function buyPoints() {
+            points += 50;
+            savePoints();
+            updatePointsDisplay();
+        }
 
         function randomSymbol() {
             return symbols[Math.floor(Math.random() * symbols.length)];
         }
 
         function startSlot() {
-            jackpotText.textContent = "";
-            let results = [];
+            if (points < 10) {
+                jackpotText.textContent = "❌ Nicht genug Punkte!";
+                jackpotText.classList.remove("jackpot-blink");
+                return;
+            }
 
-            // Sound starten
+            points -= 10;
+            savePoints();
+            updatePointsDisplay();
+            jackpotText.textContent = "";
+            jackpotText.classList.remove("jackpot-blink");
+
             spinSound.currentTime = 0;
             spinSound.play();
 
-            // Animation starten
             slots.forEach(slot => slot.classList.add("spinning"));
 
+            let results = [];
             let spins = [0, 0, 0];
             let maxSpins = [20, 30, 40];
 
@@ -113,11 +206,15 @@
                     clearInterval(interval);
 
                     if (results[0] === results[1] && results[1] === results[2]) {
-                        jackpotText.textContent = "🎉 JACKPOT!!! 🎉";
+                        jackpotText.textContent = "🎉 JACKPOT!!! +100 Punkte 🎉";
+                        jackpotText.classList.add("jackpot-blink");
+                        points += 100;
+                        savePoints();
                         jackpotSound.currentTime = 0;
                         jackpotSound.play();
+                        updatePointsDisplay();
                     } else {
-                        jackpotText.textContent = "Leider kein Jackpot. Versuch’s nochmal!";
+                        jackpotText.textContent = "Leider kein Jackpot 😢";
                     }
                 }
             }, 100);
@@ -125,5 +222,6 @@
     </script>
 </body>
 </html>
+
 
 
