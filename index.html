@@ -3,586 +3,224 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Casino Spieleplattform</title>
+  <title>ChronaCasino</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(to bottom, #000000, #333333);
-      color: #fff;
-      text-align: center;
       margin: 0;
-      padding: 0;
-      overflow-x: hidden;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to right, #000000, #1a1a1a);
+      color: gold;
     }
-    
     .navbar {
-      background-color: rgba(0, 0, 0, 0.8);
-      padding: 15px;
+      background-color: #111;
+      padding: 10px;
       display: flex;
-      justify-content: space-between;
+      justify-content: space-around;
+      border-bottom: 2px solid gold;
     }
-    
-    .navbar .logo {
-      font-size: 24px;
+    .navbar a {
       color: gold;
-    }
-    
-    .navbar .menu a {
-      color: white;
-      margin: 0 15px;
       text-decoration: none;
+      font-weight: bold;
     }
-    
-    .game-container {
-      max-width: 800px;
-      margin: 30px auto;
-      background: rgba(0, 0, 0, 0.7);
-      border: 5px solid gold;
-      border-radius: 15px;
+    .game-container, .poker-container, .wheel-container {
       padding: 20px;
-      box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+      display: none;
     }
-    
-    .game-title {
-      font-size: 2.5em;
-      color: gold;
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
-      margin-bottom: 20px;
+    .active {
+      display: block;
     }
-    
-    .slot-machine {
+    .slot {
       display: flex;
       justify-content: center;
-      align-items: center;
-      padding: 20px;
+      margin: 20px 0;
     }
-    
     .reel {
       width: 100px;
       height: 100px;
-      margin: 0 10px;
-      font-size: 3em;
-      background: white;
-      color: black;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      overflow: hidden;
-      position: relative;
-    }
-    
-    .reel-container {
-      position: relative;
-      height: 100px;
-    }
-    
-    .reel-strip {
-      position: absolute;
-      transition: top 1s ease-in-out;
-      top: 0;
-    }
-    
-    .reel-item {
-      width: 100px;
-      height: 100px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .controls {
-      margin-top: 30px;
-    }
-    
-    .btn {
-      padding: 12px 30px;
-      font-size: 1.2em;
-      border: none;
-      border-radius: 50px;
-      margin: 0 10px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    
-    .btn-spin {
-      background: linear-gradient(to bottom, #ffd700, #b8860b);
-      color: black;
-      font-weight: bold;
-      box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-    }
-    
-    .btn-spin:hover {
-      transform: scale(1.05);
-      box-shadow: 0 5px 20px rgba(255, 215, 0, 0.6);
-    }
-    
-    .btn-shop {
-      background: linear-gradient(to bottom, #28a745, #1e7e34);
-      color: white;
-    }
-    
-    .btn-shop:hover {
-      transform: scale(1.05);
-    }
-    
-    .stats {
-      display: flex;
-      justify-content: space-around;
-      margin: 20px 0;
-      font-size: 1.2em;
-    }
-    
-    .stats div {
-      background: rgba(0, 0, 0, 0.5);
-      padding: 10px 20px;
-      border-radius: 50px;
-    }
-    
-    .game-modes {
-      display: flex;
-      justify-content: center;
-      margin: 20px 0;
-    }
-    
-    .game-mode {
-      padding: 10px 20px;
-      margin: 0 10px;
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    
-    .game-mode:hover, .game-mode.active {
-      background: gold;
-      color: black;
-    }
-    
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 100;
-    }
-    
-    .modal-content {
       background: #222;
-      border: 3px solid gold;
-      border-radius: 15px;
-      width: 80%;
-      max-width: 600px;
-      margin: 50px auto;
-      padding: 20px;
-    }
-    
-    .shop-item {
+      border: 2px solid gold;
+      font-size: 48px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 15px;
-      margin: 10px 0;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 10px;
-    }
-    
-    .close-btn {
-      position: absolute;
-      right: 15px;
-      top: 15px;
-      font-size: 20px;
-      cursor: pointer;
-    }
-    
-    .game-selector {
-      display: flex;
       justify-content: center;
-      margin: 20px 0;
-    }
-    
-    .game-option {
       margin: 0 10px;
-      padding: 15px;
-      background: rgba(0, 0, 0, 0.5);
+    }
+    button {
+      padding: 10px 20px;
+      background: gold;
+      color: #000;
+      font-weight: bold;
+      border: none;
       border-radius: 10px;
       cursor: pointer;
-      transition: all 0.3s;
     }
-    
-    .game-option:hover {
-      background: gold;
-      color: black;
+    #shop {
+      margin-top: 20px;
+    }
+    .leaderboard {
+      margin-top: 30px;
+      border-top: 2px solid gold;
+      padding-top: 10px;
     }
   </style>
 </head>
 <body>
-  <!-- Navigation Bar -->
   <div class="navbar">
-    <div class="logo">🎰 CasinoHub</div>
-    <div class="menu">
-      <a href="#" onclick="switchGame('slots')">Slots</a>
-      <a href="#" onclick="switchGame('wheel')">Glücksrad</a>
-      <a href="#" onclick="switchGame('poker')">Poker</a>
-      <a href="#" onclick="openLeaderboard()">Bestenliste</a>
-      <a href="#" id="loginBtn">Anmelden</a>
+    <a href="#" onclick="showGame('slot')">Slot</a>
+    <a href="#" onclick="showGame('wheel')">Glücksrad</a>
+    <a href="#" onclick="showGame('poker')">Poker</a>
+    <a href="#" onclick="signInWithGoogle()">Login mit Google</a>
+  </div>
+
+  <div id="slot" class="game-container active">
+    <h1>Slot Machine</h1>
+    <div class="slot">
+      <div class="reel" id="reel1">🍒</div>
+      <div class="reel" id="reel2">🍒</div>
+      <div class="reel" id="reel3">🍒</div>
+    </div>
+    <button onclick="spin()">Drehen</button>
+    <p>Punkte: <span id="points">100</span></p>
+    <div id="shop">
+      <h3>Shop</h3>
+      <button onclick="buyItem('bonus', 10, 50)">+10% Glück (50 Punkte)</button>
+      <button onclick="buyItem('bonus', 20, 100)">+20% Glück (100 Punkte)</button>
+      <button onclick="buyItem('design', 1, 150)">Premium Design (150 Punkte)</button>
+      <button onclick="buyItem('pass', 1, 200)">Game Pass (200 Punkte)</button>
+    </div>
+    <div class="leaderboard">
+      <h3>Leaderboard</h3>
+      <p>(Platzhalter – wird aus Datenbank geladen)</p>
     </div>
   </div>
 
-  <!-- Main Game Container -->
-  <div class="game-container" id="gameArea">
-    <div class="game-title">Slot Machine</div>
-    
-    <!-- Stats Display -->
-    <div class="stats">
-      <div>Punkte: <span id="points">1000</span></div>
-      <div>Glücksbonus: <span id="luckBonus">0</span>%</div>
-    </div>
-    
-    <!-- Game Mode Selector -->
-    <div class="game-modes">
-      <div class="game-mode active" onclick="setGameMode('normal')">Normal</div>
-      <div class="game-mode" onclick="setGameMode('jackpot')">Jackpot</div>
-      <div class="game-mode" onclick="setGameMode('bonus')">Bonus</div>
-    </div>
-    
-    <!-- Slot Machine -->
-    <div class="slot-machine">
-      <div class="reel-container">
-        <div class="reel" id="reel1">🍒</div>
-      </div>
-      <div class="reel-container">
-        <div class="reel" id="reel2">🍋</div>
-      </div>
-      <div class="reel-container">
-        <div class="reel" id="reel3">🔔</div>
-      </div>
-    </div>
-    
-    <!-- Controls -->
-    <div class="controls">
-      <button class="btn btn-spin" onclick="spin()">SPIN</button>
-      <button class="btn btn-shop" onclick="openShop()">Shop</button>
-    </div>
+  <div id="wheel" class="wheel-container">
+    <h1>Glücksrad</h1>
+    <p>Punkte: <span id="wheelPoints">100</span></p>
+    <button onclick="spinWheel()">Drehen</button>
+    <p id="wheelResult"></p>
   </div>
 
-  <!-- Shop Modal -->
-  <div id="shopModal" class="modal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeShop()">✖</span>
-      <h2 style="color: gold;">Shop</h2>
-      
-      <div class="shop-item">
-        <div>Glücksbonus +10%</div>
-        <audio id="spinSound" src="media/slot-machine-3.mp3" preload="auto"></audio>
-        <audio id="winSound" src="media/slot-machine-6.mp3" preload="auto"></audio>
-        <audio id="jackpotSound" src="media/bell-ringing-05.mp3" preload="auto"></audio>
-        <audio id="bgMusic" src="media/upbeat-fun-02.mp3" preload="auto" loop></audio>
-         
-      <div class="shop-item">
-        <div>Glücksbonus +20%</div>
-        <div>200 Punkte</div>
-        <button class="btn" onclick="buyItem('luck', 20, 200)">Kaufen</button>
-      </div>
-      
-      <div class="shop-item">
-        <div>Premium Design</div>
-        <div>300 Punkte</div>
-        <button class="btn" onclick="buyItem('design', 1, 300)">Kaufen</button>
-      </div>
-      
-      <div class="shop-item">
-        <div>Game Pass</div>
-        <div>500 Punkte</div>
-        function playSound(id) {
-          const sound = document.getElementById(id);
-          sound.currentTime = 0;
-          const playPromise = sound.play();
-          
-          if (playPromise !== undefined) {
-            playPromise.catch(error => {
-              console.error(`Fehler beim Abspielen des Sounds ${id}:`, error);
-            });
-          }
-        }
-        
-        <button class="btn" onclick="openPayPal()">Mit PayPal aufladen</button>
-      </div>
-    </div>
+  <div id="poker" class="poker-container">
+    <h1>Poker (Gegen Bot)</h1>
+    <p>Du: <span id="pokerPlayer"></span></p>
+    <p>Bot: <span id="pokerBot"></span></p>
+    <button onclick="playPoker()">Spielen</button>
+    <p id="pokerResult"></p>
   </div>
 
-  <!-- Sounds -->
-  <audio id="spinSound" src="https://www.soundjay.com/mechanical/sounds/slot-machine-3.mp3" preload="auto"></audio>
-  <audio id="winSound" src="https://www.soundjay.com/mechanical/sounds/slot-machine-6.mp3" preload="auto"></audio>
-  <audio id="jackpotSound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" preload="auto"></audio>
-  <audio id="bgMusic" src="https://www.soundjay.com/free-music/sounds/upbeat-fun-02.mp3" preload="auto" loop></audio>
+  <audio id="spinSound" src="media/slot-machine-3.mp3" preload="auto"></audio>
+  <audio id="winSound" src="media/win.mp3" preload="auto"></audio>
+  <audio id="jackpotSound" src="media/jackpot.mp3" preload="auto"></audio>
+  <audio id="bgMusic" src="media/bg.mp3" preload="auto" loop autoplay></audio>
 
-  <script>
-    // Game Variables
-    let points = 1000;
-    let luckBonus = 0;
-    let currentGameMode = 'normal';
-    let currentGame = 'slots';
-    let hasGamePass = false;
-    let hasPremiumDesign = false;
-    
-    // Symbols and their base values
-    const symbols = [
-      { emoji: "🍒", value: 10 },
-      { emoji: "🍋", value: 20 },
-      { emoji: "🔔", value: 30 },
-      { emoji: "🍀", value: 40 },
-      { emoji: "💎", value: 50 }
-    ];
-    
-    // Initialize game
-    document.addEventListener('DOMContentLoaded', function() {
-      updatePoints();
-      updateLuckBonus();
-      
-      // Start background music when user interacts
-      document.body.addEventListener('click', function() {
-        document.getElementById('bgMusic').play();
-      }, { once: true });
-    });
-    
-    // Play sound
+  <script type="module">
+    // Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "DEIN_API_KEY",
+      authDomain: "DEIN_AUTH_DOMAIN",
+      projectId: "DEIN_PROJECT_ID",
+      storageBucket: "DEIN_STORAGE_BUCKET",
+      messagingSenderId: "DEIN_MSG_ID",
+      appId: "DEIN_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+
+    window.signInWithGoogle = async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        const result = await signInWithPopup(auth, provider);
+        alert("Eingeloggt als: " + result.user.displayName);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    // UI Steuerung
+    window.showGame = (game) => {
+      document.querySelectorAll('.game-container, .wheel-container, .poker-container').forEach(el => el.classList.remove('active'));
+      document.getElementById(game).classList.add('active');
+    };
+
+    // Sounds
     function playSound(id) {
-      const sound = document.getElementById(id);
-      sound.currentTime = 0;
-      sound.play();
+      document.getElementById(id).play();
     }
-    
-    // Spin the slot machine
-    function spin() {
-      // Check if player has enough points
-      if (points < 10) {
-        alert("Nicht genug Punkte!");
-        return;
-      }
-      
-      // Deduct points (cost to spin)
+
+    // Slot-Logik
+    let points = 100;
+    let luck = 0;
+    let gamePass = false;
+
+    window.spin = () => {
+      if (points < 10) return alert("Nicht genug Punkte!");
       points -= 10;
-      updatePoints();
-      
-      // Play spin sound
-      playSound('spinSound');
-      
-      // Animate reels
-      animateReels();
-      
-      // Calculate results after animation finishes
-      setTimeout(calculateResults, 1000);
-    }
-    
-    // Animate reels
-    function animateReels() {
-      const reels = [
-        document.getElementById('reel1'),
-        document.getElementById('reel2'),
-        document.getElementById('reel3')
-      ];
-      
-      // Simple animation - random symbols during animation
-      let animationInterval = setInterval(function() {
-        reels.forEach(reel => {
-          const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-          reel.textContent = randomSymbol.emoji;
-        });
-      }, 100);
-      
-      // Stop animation after 1 second
-      setTimeout(function() {
-        clearInterval(animationInterval);
-      }, 1000);
-    }
-    
-    // Calculate results of the spin
-    function calculateResults() {
-      // Apply luck bonus if any
-      const effectiveLuck = luckBonus / 100; // Convert percentage to decimal
-      
-      // Get random results for each reel
-      let results = [];
-      for (let i = 0; i < 3; i++) {
-        // The higher the luck bonus, the more likely to get higher value symbols
-        let randomIndex;
-        if (Math.random() < effectiveLuck) {
-          // Higher chance for better symbols with luck bonus
-          randomIndex = Math.min(
-            Math.floor(Math.random() * symbols.length + effectiveLuck * 2),
-            symbols.length - 1
-          );
-        } else {
-          randomIndex = Math.floor(Math.random() * symbols.length);
-        }
-        results.push(symbols[randomIndex]);
+      document.getElementById("points").innerText = points;
+      playSound("spinSound");
+
+      const symbols = ['🍒', '🍋', '🔔', '💎'];
+      const r1 = symbols[Math.floor(Math.random() * symbols.length)];
+      const r2 = symbols[Math.floor(Math.random() * symbols.length)];
+      const r3 = symbols[Math.floor(Math.random() * symbols.length)];
+
+      document.getElementById("reel1").innerText = r1;
+      document.getElementById("reel2").innerText = r2;
+      document.getElementById("reel3").innerText = r3;
+
+      let reward = 0;
+      if (r1 === r2 && r2 === r3) reward = 100;
+      else if (r1 === r2 || r2 === r3 || r1 === r3) reward = 30;
+
+      if (reward > 0) {
+        reward += reward * (luck / 100);
+        if (gamePass) reward *= 1.2;
+        points += reward;
+        document.getElementById("points").innerText = Math.floor(points);
+        playSound(reward >= 100 ? "jackpotSound" : "winSound");
       }
-      
-      // Display results
-      document.getElementById('reel1').textContent = results[0].emoji;
-      document.getElementById('reel2').textContent = results[1].emoji;
-      document.getElementById('reel3').textContent = results[2].emoji;
-      
-      // Check for wins
-      checkForWins(results);
-    }
-    
-    // Check for winning combinations
-    function checkForWins(results) {
-      // Three of a kind
-      if (results[0].emoji === results[1].emoji && results[1].emoji === results[2].emoji) {
-        // Jackpot! Base value × 10
-        const baseValue = results[0].value;
-        const winAmount = baseValue * 10;
-        
-        // Bonus for Jackpot mode
-        let finalWinAmount = currentGameMode === 'jackpot' ? winAmount * 2 : winAmount;
-        
-        // Game pass bonus
-        if (hasGamePass) finalWinAmount = Math.floor(finalWinAmount * 1.2);
-        
-        points += finalWinAmount;
-        playSound('jackpotSound');
-        
-        // Show win message
-        alert(`JACKPOT! Du hast ${finalWinAmount} Punkte gewonnen!`);
-      } 
-      // Two of a kind
-      else if (
-        results[0].emoji === results[1].emoji || 
-        results[1].emoji === results[2].emoji || 
-        results[0].emoji === results[2].emoji
-      ) {
-        // Calculate which symbols matched
-        let matchedSymbol;
-        if (results[0].emoji === results[1].emoji) matchedSymbol = results[0];
-        else if (results[1].emoji === results[2].emoji) matchedSymbol = results[1];
-        else matchedSymbol = results[0];
-        
-        // Win is base value × 2
-        let winAmount = matchedSymbol.value * 2;
-        
-        // Bonus for Bonus mode
-        if (currentGameMode === 'bonus') winAmount = Math.floor(winAmount * 1.5);
-        
-        // Game pass bonus
-        if (hasGamePass) winAmount = Math.floor(winAmount * 1.2);
-        
-        points += winAmount;
-        playSound('winSound');
-        
-        // Show win message
-        alert(`Kleiner Gewinn! ${winAmount} Punkte.`);
-      }
-      
-      updatePoints();
-    }
-    
-    // Update points display
-    function updatePoints() {
-      document.getElementById('points').textContent = points;
-    }
-    
-    // Update luck bonus display
-    function updateLuckBonus() {
-      document.getElementById('luckBonus').textContent = luckBonus;
-    }
-    
-    // Set game mode
-    function setGameMode(mode) {
-      currentGameMode = mode;
-      
-      // Update UI to show active mode
-      const modes = document.querySelectorAll('.game-mode');
-      modes.forEach(modeElement => {
-        if (modeElement.textContent.toLowerCase() === mode) {
-          modeElement.classList.add('active');
-        } else {
-          modeElement.classList.remove('active');
-        }
-      });
-    }
-    
-    // Open shop
-    function openShop() {
-      document.getElementById('shopModal').style.display = 'block';
-    }
-    
-    // Close shop
-    function closeShop() {
-      document.getElementById('shopModal').style.display = 'none';
-    }
-    
-    // Buy item from shop
-    function buyItem(type, amount, cost) {
-      if (points < cost) {
-        alert("Nicht genug Punkte!");
-        return;
-      }
-      
+    };
+
+    // Shop-Logik
+    window.buyItem = (type, amount, cost) => {
+      if (points < cost) return alert("Nicht genug Punkte!");
       points -= cost;
-      
-      switch(type) {
-        case 'luck':
-          luckBonus += amount;
-          updateLuckBonus();
-          alert(`Glücksbonus um ${amount}% erhöht!`);
-          break;
-        case 'design':
-          hasPremiumDesign = true;
-          document.body.style.background = "linear-gradient(to bottom, #000000, #4B0082)";
-          document.querySelector('.game-container').style.boxShadow = "0 0 50px rgba(255, 0, 255, 0.5)";
-          alert("Premium Design freigeschaltet!");
-          break;
-        case 'pass':
-          hasGamePass = true;
-          alert("Game Pass aktiviert! Du erhältst 20% mehr Gewinne.");
-          break;
-      }
-      
-      updatePoints();
-    }
-    
-    // Open PayPal (placeholder)
-    function openPayPal() {
-      alert("PayPal-Integration würde hier erfolgen. In einer echten Anwendung würde dies zu einer sicheren Zahlungsseite führen.");
-    }
-    
-    // Switch between games (placeholder)
-    function switchGame(game) {
-      currentGame = game;
-      
-      // Update game UI based on selected game (simplified for example)
-      const gameTitle = document.querySelector('.game-title');
-      
-      switch(game) {
-        case 'slots':
-          gameTitle.textContent = "Slot Machine";
-          break;
-        case 'wheel':
-          gameTitle.textContent = "Glücksrad";
-          alert("Glücksrad-Spiel würde hier geladen. In einer vollständigen Anwendung würde eine andere Spieloberfläche angezeigt.");
-          break;
-        case 'poker':
-          gameTitle.textContent = "Poker";
-          alert("Poker-Spiel würde hier geladen. In einer vollständigen Anwendung würde eine andere Spieloberfläche mit NPC-Gegnern angezeigt.");
-          break;
-      }
-    }
-    
-    // Open leaderboard (placeholder)
-    function openLeaderboard() {
-      alert("Bestenliste würde hier angezeigt. In einer vollständigen Anwendung würde eine Liste der Top-Spieler aus einer Datenbank geladen.");
-    }
-    
-    // Login functionality (placeholder)
-    document.getElementById('loginBtn').addEventListener('click', function() {
-      alert("Google-Login würde hier integriert. In einer vollständigen Anwendung würde OAuth für sicheres Einloggen verwendet.");
-    });
+      document.getElementById("points").innerText = points;
+      if (type === 'bonus') luck += amount;
+      if (type === 'pass') gamePass = true;
+      if (type === 'design') alert("Design freigeschaltet!");
+    };
+
+    // Glücksrad
+    window.spinWheel = () => {
+      const wheelPoints = document.getElementById("wheelPoints");
+      let pointsVal = parseInt(wheelPoints.innerText);
+      if (pointsVal < 10) return alert("Nicht genug Punkte!");
+      pointsVal -= 10;
+      const outcomes = ["+10 Punkte", "+50 Punkte", "Niete", "Jackpot: +100 Punkte"];
+      const result = outcomes[Math.floor(Math.random() * outcomes.length)];
+      if (result.includes("10")) pointsVal += 10;
+      if (result.includes("50")) pointsVal += 50;
+      if (result.includes("100")) pointsVal += 100;
+      wheelPoints.innerText = pointsVal;
+      document.getElementById("wheelResult").innerText = result;
+    };
+
+    // Poker
+    window.playPoker = () => {
+      const cards = ["A", "K", "Q", "J", "10"];
+      const player = cards[Math.floor(Math.random() * cards.length)];
+      const bot = cards[Math.floor(Math.random() * cards.length)];
+      document.getElementById("pokerPlayer").innerText = player;
+      document.getElementById("pokerBot").innerText = bot;
+      const result = cards.indexOf(player) < cards.indexOf(bot) ? "Du gewinnst!" : (player === bot ? "Unentschieden." : "Bot gewinnt.");
+      document.getElementById("pokerResult").innerText = result;
+    };
   </script>
 </body>
 </html>
