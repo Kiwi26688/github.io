@@ -277,10 +277,11 @@
       
       <div class="shop-item">
         <div>Glücksbonus +10%</div>
-        <div>100 Punkte</div>
-        <button class="btn" onclick="buyItem('luck', 10, 100)">Kaufen</button>
-      </div>
-      
+        <audio id="spinSound" src="media/slot-machine-3.mp3" preload="auto"></audio>
+        <audio id="winSound" src="media/slot-machine-6.mp3" preload="auto"></audio>
+        <audio id="jackpotSound" src="media/bell-ringing-05.mp3" preload="auto"></audio>
+        <audio id="bgMusic" src="media/upbeat-fun-02.mp3" preload="auto" loop></audio>
+         
       <div class="shop-item">
         <div>Glücksbonus +20%</div>
         <div>200 Punkte</div>
@@ -296,10 +297,18 @@
       <div class="shop-item">
         <div>Game Pass</div>
         <div>500 Punkte</div>
-        <button class="btn" onclick="buyItem('pass', 1, 500)">Kaufen</button>
-      </div>
-      
-      <div style="margin-top: 20px; border-top: 1px solid gray; padding-top: 20px;">
+        function playSound(id) {
+          const sound = document.getElementById(id);
+          sound.currentTime = 0;
+          const playPromise = sound.play();
+          
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              console.error(`Fehler beim Abspielen des Sounds ${id}:`, error);
+            });
+          }
+        }
+        
         <button class="btn" onclick="openPayPal()">Mit PayPal aufladen</button>
       </div>
     </div>
