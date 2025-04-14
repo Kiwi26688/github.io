@@ -1,134 +1,148 @@
-// Hauptkomponenten: Lobby, Game, Info, Bot, Kartentisch import React, { useState } from "react"; import { Button } from "@/components/ui/button"; import { Card, CardContent } from "@/components/ui/card"; import { motion, AnimatePresence } from "framer-motion";
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Poker Lobby</title>
+  <style>
+    body { font-family: sans-serif; background: white; text-align: center; padding: 2rem; }
+    .card { display: inline-block; margin: 5px; padding: 1rem; border: 1px solid black; border-radius: 8px; width: 60px; height: 90px; font-size: 24px; cursor: pointer; }
+    .card.disabled { opacity: 0.4; pointer-events: none; }
+    .popup { position: fixed; top: 10%; left: 50%; transform: translateX(-50%); background: #fff; border: 1px solid #000; padding: 1rem; width: 300px; z-index: 100; }
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; }
+    input { padding: 0.5rem; font-size: 16px; }
+    button { margin: 5px; padding: 0.5rem 1rem; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h1>Poker Lobby</h1>
+  <div id="main"></div>
 
-const generateLobbyCode = () => Math.random().toString(36).substring(2, 8).toUpperCase();
+  <script>
+    const sampleCards = ["♠A", "♦10", "♣7", "♥K", "♠3"];
+    let lobbyCode = "";
+    let joined = false;
+    let training = false;
+    let selected = null;
+    let table = [];
+    let points = { player: 0, bot: 0 };
 
-const sampleCards = ["♠A", "♦10", "♣7", "♥K", "♠3"];
+    const cardValue = (card) => {
+      const v = card.slice(1);
+      return { J:11, Q:12, K:13, A:14 }[v] || parseInt(v);
+    };
 
-export default function PokerLobbyApp() { const [lobbyCode, setLobbyCode] = useState(""); const [joinedLobby, setJoinedLobby] = useState(false); const [showInfo, setShowInfo] = useState(false); const [selectedCard, setSelectedCard] = useState(null); const [trainingMode, setTrainingMode] = useState(false); const [playedCards, setPlayedCards] = useState([]); const [showTable, setShowTable] = useState(false); const [isBotTurn, setIsBotTurn] = useState(false); const [playerPoints, setPlayerPoints] = useState(0); const [botPoints, setBotPoints] = useState(0); const [currentBotCard, setCurrentBotCard] = useState(null);
+    const randomCard = () => sampleCards[Math.floor(Math.random() * sampleCards.length)];
 
-const createLobby = () => { const code = generateLobbyCode(); setLobbyCode(code); setJoinedLobby(true); setTrainingMode(false); };
+    const playCard = (i) => {
+      if (selected !== null) return;
+      selected = i;
+      const playerCard = sampleCards[i];
+      const botCard = randomCard();
+      table.push({ player: playerCard, bot: botCard });
 
-const joinLobby = (code) => { if (code.length === 6) { setLobbyCode(code.toUpperCase()); setJoinedLobby(true); setTrainingMode(false); } };
+      const pVal = cardValue(playerCard);
+      const bVal = cardValue(botCard);
 
-const startTraining = () => { setLobbyCode("TRAINING"); setJoinedLobby(true); setTrainingMode(true); };
+      if (pVal > bVal) points.player++;
+      else if (bVal > pVal) points.bot++;
 
-const botMove = () => { const botCard = sampleCards[Math.floor(Math.random() * sampleCards.length)]; return botCard; };
+      render();
+      setTimeout(() => { selected = null; render(); }, 1500);
+    };
 
-const cardValue = (card) => { const value = card.slice(1); const cardMap = { J: 11, Q: 12, K: 13, A: 14 }; return cardMap[value] || parseInt(value); };
-
-const playCard = (cardIndex) => { if (isBotTurn) return;
-
-setSelectedCard(cardIndex);
-const playerCard = sampleCards[cardIndex];
-setIsBotTurn(true);
-
-setTimeout(() => {
-  const botCard = botMove();
-  setCurrentBotCard(botCard);
-  setPlayedCards((prev) => [...prev, { player: playerCard, bot: botCard }]);
-
-  const playerVal = cardValue(playerCard);
-  const botVal = cardValue(botCard);
-
-  if (playerVal > botVal) setPlayerPoints((p) => p + 1);
-  else if (botVal > playerVal) setBotPoints((b) => b + 1);
-
-  setIsBotTurn(false);
-}, 1500);
-
-};
-
-return ( <div className="min-h-screen bg-white p-4 flex flex-col items-center justify-center space-y-4"> {!joinedLobby ? ( <div className="space-y-2"> <Button onClick={createLobby}>Lobby erstellen</Button> <input type="text" placeholder="Lobby-Code eingeben" maxLength={6} className="border p-2 rounded" onKeyDown={(e) => e.key === "Enter" && joinLobby(e.target.value)} /> <Button variant="outline" onClick={startTraining}> Gegen Bot trainieren </Button> </div> ) : ( <div className="text-center space-y-4"> <h2 className="text-xl font-bold"> {trainingMode ? "Trainingsmodus gegen Bot" : Lobby-Code: ${lobbyCode}} </h2>
-
-<div className="flex gap-2 items-center justify-center flex-wrap">
-        {sampleCards.map((card, index) => (
-          <AnimatePresence key={index}>
-            {selectedCard !== index && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.5 }}
-                className={`cursor-pointer transition-transform duration-200 ${
-                  isBotTurn ? "opacity-50 pointer-events-none" : ""
-                }`}
-                whileTap={{ scale: 1.2 }}
-                onClick={() => playCard(index)}
-              >
-                <Card className="w-16 h-24 flex items-center justify-center text-2xl">
-                  <CardContent>{card}</CardContent>
-                </Card>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        ))}
-        <Button variant="outline" onClick={() => setShowInfo(true)}>
-          ?
-        </Button>
-        <Button variant="outline" onClick={() => setShowTable(true)}>
-          Tisch anzeigen
-        </Button>
-      </div>
-
-      {selectedCard !== null && currentBotCard && (
-        <div className="text-lg mt-2">
-          Du hast {sampleCards[selectedCard]} gespielt. Der Bot spielt: {currentBotCard}
+    const render = () => {
+      document.getElementById("main").innerHTML = joined ? `
+        <h2>${training ? "Trainingsmodus" : "Lobby-Code: " + lobbyCode}</h2>
+        <div>
+          ${sampleCards.map((c, i) => `
+            <div class="card ${selected !== null ? 'disabled' : ''}" onclick="playCard(${i})">${c}</div>
+          `).join("")}
+          <br/>
+          <button onclick="showInfo()">?</button>
+          <button onclick="showTable()">Tisch anzeigen</button>
         </div>
-      )}
+        <p>Punkte – Du: ${points.player} | Bot: ${points.bot}</p>
+      ` : `
+        <button onclick="createLobby()">Lobby erstellen</button><br/>
+        <input id="codeInput" placeholder="Lobby-Code eingeben" maxlength="6" />
+        <button onclick="joinLobby()">Beitreten</button><br/>
+        <button onclick="startTraining()">Gegen Bot trainieren</button>
+      `;
+    };
 
-      <div className="text-md mt-2">
-        Punkte – Du: {playerPoints} | Bot: {botPoints}
-      </div>
-    </div>
-  )}
+    const createLobby = () => {
+      lobbyCode = Math.random().toString(36).substr(2, 6).toUpperCase();
+      joined = true; training = false;
+      render();
+    };
 
-  {showTable && (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-4 rounded shadow-lg max-w-md w-full">
-        <h2 className="text-lg font-bold mb-2">Gespielte Karten</h2>
-        {playedCards.length === 0 ? (
-          <p>Es wurden noch keine Karten gespielt.</p>
-        ) : (
-          <ul className="space-y-1">
-            {playedCards.map((round, idx) => (
-              <li key={idx} className="text-left">
-                Runde {idx + 1}: Du – {round.player} | Bot – {round.bot}
-              </li>
-            ))}
-          </ul>
-        )}
-        <Button className="mt-4" onClick={() => setShowTable(false)}>
-          Schließen
-        </Button>
-      </div>
-    </div>
-  )}
+    const joinLobby = () => {
+      const code = document.getElementById("codeInput").value.trim().toUpperCase();
+      if (code.length === 6) {
+        lobbyCode = code; joined = true; training = false;
+        render();
+      }
+    };
 
-  {showInfo && (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-4 rounded shadow-lg max-w-md w-full">
-        <h2 className="text-lg font-bold mb-2">Poker Regeln</h2>
-        <p className="mb-2">
-          Ziel ist es, mit fünf Karten eine möglichst starke Kombination zu bilden. Hier sind die Hände von schwach nach stark:
-        </p>
-        <ul className="text-left list-disc pl-5 space-y-1 text-sm">
-          <li><strong>High Card:</strong> Keine Kombination – höchste Karte zählt</li>
-          <li><strong>Ein Paar:</strong> Zwei gleiche Karten</li>
-          <li><strong>Zwei Paare:</strong> Zwei verschiedene Paare</li>
-          <li><strong>Drilling:</strong> Drei gleiche Karten</li>
-          <li><strong>Straße:</strong> Fünf aufeinanderfolgende Karten</li>
-          <li><strong>Flush:</strong> Fünf Karten derselben Farbe</li>
-          <li><strong>Full House:</strong> Drilling + ein Paar</li>
-          <li><strong>Vierling:</strong> Vier gleiche Karten</li>
-          <li><strong>Straight Flush:</strong> Straße + Flush gleichzeitig</li>
-          <li><strong>Royal Flush:</strong> 10 bis Ass in einer Farbe</li>
+    const startTraining = () => {
+      joined = true; training = true;
+      render();
+    };
+
+    const showInfo = () => {
+      const overlay = document.createElement("div");
+      overlay.className = "overlay";
+      overlay.onclick = () => document.body.removeChild(overlay);
+
+      const popup = document.createElement("div");
+      popup.className = "popup";
+      popup.innerHTML = `
+        <h3>Poker Hände</h3>
+        <ul style="text-align:left; font-size: 14px;">
+          <li><b>High Card:</b> keine Kombination</li>
+          <li><b>Ein Paar:</b> zwei gleiche Karten</li>
+          <li><b>Zwei Paare:</b> zwei verschiedene Paare</li>
+          <li><b>Drilling:</b> drei gleiche Karten</li>
+          <li><b>Straße:</b> fünf aufeinanderfolgende Karten</li>
+          <li><b>Flush:</b> fünf Karten derselben Farbe</li>
+          <li><b>Full House:</b> Drilling + ein Paar</li>
+          <li><b>Vierling:</b> vier gleiche Karten</li>
+          <li><b>Straight Flush:</b> Straße + Flush</li>
+          <li><b>Royal Flush:</b> 10 bis Ass in einer Farbe</li>
         </ul>
-        <Button className="mt-4" onClick={() => setShowInfo(false)}>
-          Schließen
-        </Button>
-      </div>
-    </div>
-  )}
-</div>
+        <button onclick="document.body.removeChild(this.parentElement.parentElement)">Schließen</button>
+      `;
+      overlay.appendChild(popup);
+      document.body.appendChild(overlay);
+    };
 
-); }
+    const showTable = () => {
+      const overlay = document.createElement("div");
+      overlay.className = "overlay";
+      overlay.onclick = () => document.body.removeChild(overlay);
 
+      const popup = document.createElement("div");
+      popup.className = "popup";
+      popup.innerHTML = `
+        <h3>Gespielte Karten</h3>
+        <ul style="text-align:left; font-size: 14px;">
+          ${table.length === 0 ? "<li>Keine Karten gespielt</li>" :
+            table.map((r, i) => `<li>Runde ${i+1}: Du – ${r.player}, Bot – ${r.bot}</li>`).join("")}
+        </ul>
+        <button onclick="document.body.removeChild(this.parentElement.parentElement)">Schließen</button>
+      `;
+      overlay.appendChild(popup);
+      document.body.appendChild(overlay);
+    };
+
+    window.playCard = playCard;
+    window.createLobby = createLobby;
+    window.joinLobby = joinLobby;
+    window.startTraining = startTraining;
+    window.showInfo = showInfo;
+    window.showTable = showTable;
+
+    render();
+  </script>
+</body>
+</html>
