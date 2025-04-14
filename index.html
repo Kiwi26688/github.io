@@ -1,226 +1,134 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChronaCasino</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(to right, #000000, #1a1a1a);
-      color: gold;
-    }
-    .navbar {
-      background-color: #111;
-      padding: 10px;
-      display: flex;
-      justify-content: space-around;
-      border-bottom: 2px solid gold;
-    }
-    .navbar a {
-      color: gold;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .game-container, .poker-container, .wheel-container {
-      padding: 20px;
-      display: none;
-    }
-    .active {
-      display: block;
-    }
-    .slot {
-      display: flex;
-      justify-content: center;
-      margin: 20px 0;
-    }
-    .reel {
-      width: 100px;
-      height: 100px;
-      background: #222;
-      border: 2px solid gold;
-      font-size: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 10px;
-    }
-    button {
-      padding: 10px 20px;
-      background: gold;
-      color: #000;
-      font-weight: bold;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    #shop {
-      margin-top: 20px;
-    }
-    .leaderboard {
-      margin-top: 30px;
-      border-top: 2px solid gold;
-      padding-top: 10px;
-    }
-  </style>
-</head>
-<body>
-  <div class="navbar">
-    <a href="#" onclick="showGame('slot')">Slot</a>
-    <a href="#" onclick="showGame('wheel')">Glücksrad</a>
-    <a href="#" onclick="showGame('poker')">Poker</a>
-    <a href="#" onclick="signInWithGoogle()">Login mit Google</a>
-  </div>
+// Hauptkomponenten: Lobby, Game, Info, Bot, Kartentisch import React, { useState } from "react"; import { Button } from "@/components/ui/button"; import { Card, CardContent } from "@/components/ui/card"; import { motion, AnimatePresence } from "framer-motion";
 
-  <div id="slot" class="game-container active">
-    <h1>Slot Machine</h1>
-    <div class="slot">
-      <div class="reel" id="reel1">🍒</div>
-      <div class="reel" id="reel2">🍒</div>
-      <div class="reel" id="reel3">🍒</div>
+const generateLobbyCode = () => Math.random().toString(36).substring(2, 8).toUpperCase();
+
+const sampleCards = ["♠A", "♦10", "♣7", "♥K", "♠3"];
+
+export default function PokerLobbyApp() { const [lobbyCode, setLobbyCode] = useState(""); const [joinedLobby, setJoinedLobby] = useState(false); const [showInfo, setShowInfo] = useState(false); const [selectedCard, setSelectedCard] = useState(null); const [trainingMode, setTrainingMode] = useState(false); const [playedCards, setPlayedCards] = useState([]); const [showTable, setShowTable] = useState(false); const [isBotTurn, setIsBotTurn] = useState(false); const [playerPoints, setPlayerPoints] = useState(0); const [botPoints, setBotPoints] = useState(0); const [currentBotCard, setCurrentBotCard] = useState(null);
+
+const createLobby = () => { const code = generateLobbyCode(); setLobbyCode(code); setJoinedLobby(true); setTrainingMode(false); };
+
+const joinLobby = (code) => { if (code.length === 6) { setLobbyCode(code.toUpperCase()); setJoinedLobby(true); setTrainingMode(false); } };
+
+const startTraining = () => { setLobbyCode("TRAINING"); setJoinedLobby(true); setTrainingMode(true); };
+
+const botMove = () => { const botCard = sampleCards[Math.floor(Math.random() * sampleCards.length)]; return botCard; };
+
+const cardValue = (card) => { const value = card.slice(1); const cardMap = { J: 11, Q: 12, K: 13, A: 14 }; return cardMap[value] || parseInt(value); };
+
+const playCard = (cardIndex) => { if (isBotTurn) return;
+
+setSelectedCard(cardIndex);
+const playerCard = sampleCards[cardIndex];
+setIsBotTurn(true);
+
+setTimeout(() => {
+  const botCard = botMove();
+  setCurrentBotCard(botCard);
+  setPlayedCards((prev) => [...prev, { player: playerCard, bot: botCard }]);
+
+  const playerVal = cardValue(playerCard);
+  const botVal = cardValue(botCard);
+
+  if (playerVal > botVal) setPlayerPoints((p) => p + 1);
+  else if (botVal > playerVal) setBotPoints((b) => b + 1);
+
+  setIsBotTurn(false);
+}, 1500);
+
+};
+
+return ( <div className="min-h-screen bg-white p-4 flex flex-col items-center justify-center space-y-4"> {!joinedLobby ? ( <div className="space-y-2"> <Button onClick={createLobby}>Lobby erstellen</Button> <input type="text" placeholder="Lobby-Code eingeben" maxLength={6} className="border p-2 rounded" onKeyDown={(e) => e.key === "Enter" && joinLobby(e.target.value)} /> <Button variant="outline" onClick={startTraining}> Gegen Bot trainieren </Button> </div> ) : ( <div className="text-center space-y-4"> <h2 className="text-xl font-bold"> {trainingMode ? "Trainingsmodus gegen Bot" : Lobby-Code: ${lobbyCode}} </h2>
+
+<div className="flex gap-2 items-center justify-center flex-wrap">
+        {sampleCards.map((card, index) => (
+          <AnimatePresence key={index}>
+            {selectedCard !== index && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.5 }}
+                className={`cursor-pointer transition-transform duration-200 ${
+                  isBotTurn ? "opacity-50 pointer-events-none" : ""
+                }`}
+                whileTap={{ scale: 1.2 }}
+                onClick={() => playCard(index)}
+              >
+                <Card className="w-16 h-24 flex items-center justify-center text-2xl">
+                  <CardContent>{card}</CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        ))}
+        <Button variant="outline" onClick={() => setShowInfo(true)}>
+          ?
+        </Button>
+        <Button variant="outline" onClick={() => setShowTable(true)}>
+          Tisch anzeigen
+        </Button>
+      </div>
+
+      {selectedCard !== null && currentBotCard && (
+        <div className="text-lg mt-2">
+          Du hast {sampleCards[selectedCard]} gespielt. Der Bot spielt: {currentBotCard}
+        </div>
+      )}
+
+      <div className="text-md mt-2">
+        Punkte – Du: {playerPoints} | Bot: {botPoints}
+      </div>
     </div>
-    <button onclick="spin()">Drehen</button>
-    <p>Punkte: <span id="points">100</span></p>
-    <div id="shop">
-      <h3>Shop</h3>
-      <button onclick="buyItem('bonus', 10, 50)">+10% Glück (50 Punkte)</button>
-      <button onclick="buyItem('bonus', 20, 100)">+20% Glück (100 Punkte)</button>
-      <button onclick="buyItem('design', 1, 150)">Premium Design (150 Punkte)</button>
-      <button onclick="buyItem('pass', 1, 200)">Game Pass (200 Punkte)</button>
+  )}
+
+  {showTable && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-4 rounded shadow-lg max-w-md w-full">
+        <h2 className="text-lg font-bold mb-2">Gespielte Karten</h2>
+        {playedCards.length === 0 ? (
+          <p>Es wurden noch keine Karten gespielt.</p>
+        ) : (
+          <ul className="space-y-1">
+            {playedCards.map((round, idx) => (
+              <li key={idx} className="text-left">
+                Runde {idx + 1}: Du – {round.player} | Bot – {round.bot}
+              </li>
+            ))}
+          </ul>
+        )}
+        <Button className="mt-4" onClick={() => setShowTable(false)}>
+          Schließen
+        </Button>
+      </div>
     </div>
-    <div class="leaderboard">
-      <h3>Leaderboard</h3>
-      <p>(Platzhalter – wird aus Datenbank geladen)</p>
+  )}
+
+  {showInfo && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-4 rounded shadow-lg max-w-md w-full">
+        <h2 className="text-lg font-bold mb-2">Poker Regeln</h2>
+        <p className="mb-2">
+          Ziel ist es, mit fünf Karten eine möglichst starke Kombination zu bilden. Hier sind die Hände von schwach nach stark:
+        </p>
+        <ul className="text-left list-disc pl-5 space-y-1 text-sm">
+          <li><strong>High Card:</strong> Keine Kombination – höchste Karte zählt</li>
+          <li><strong>Ein Paar:</strong> Zwei gleiche Karten</li>
+          <li><strong>Zwei Paare:</strong> Zwei verschiedene Paare</li>
+          <li><strong>Drilling:</strong> Drei gleiche Karten</li>
+          <li><strong>Straße:</strong> Fünf aufeinanderfolgende Karten</li>
+          <li><strong>Flush:</strong> Fünf Karten derselben Farbe</li>
+          <li><strong>Full House:</strong> Drilling + ein Paar</li>
+          <li><strong>Vierling:</strong> Vier gleiche Karten</li>
+          <li><strong>Straight Flush:</strong> Straße + Flush gleichzeitig</li>
+          <li><strong>Royal Flush:</strong> 10 bis Ass in einer Farbe</li>
+        </ul>
+        <Button className="mt-4" onClick={() => setShowInfo(false)}>
+          Schließen
+        </Button>
+      </div>
     </div>
-  </div>
+  )}
+</div>
 
-  <div id="wheel" class="wheel-container">
-    <h1>Glücksrad</h1>
-    <p>Punkte: <span id="wheelPoints">100</span></p>
-    <button onclick="spinWheel()">Drehen</button>
-    <p id="wheelResult"></p>
-  </div>
+); }
 
-  <div id="poker" class="poker-container">
-    <h1>Poker (Gegen Bot)</h1>
-    <p>Du: <span id="pokerPlayer"></span></p>
-    <p>Bot: <span id="pokerBot"></span></p>
-    <button onclick="playPoker()">Spielen</button>
-    <p id="pokerResult"></p>
-  </div>
-
-  <audio id="spinSound" src="media/slot-machine-3.mp3" preload="auto"></audio>
-  <audio id="winSound" src="media/win.mp3" preload="auto"></audio>
-  <audio id="jackpotSound" src="media/jackpot.mp3" preload="auto"></audio>
-  <audio id="bgMusic" src="media/bg.mp3" preload="auto" loop autoplay></audio>
-
-  <script type="module">
-    // Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "DEIN_API_KEY",
-      authDomain: "DEIN_AUTH_DOMAIN",
-      projectId: "DEIN_PROJECT_ID",
-      storageBucket: "DEIN_STORAGE_BUCKET",
-      messagingSenderId: "DEIN_MSG_ID",
-      appId: "DEIN_APP_ID"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
-
-    window.signInWithGoogle = async () => {
-      const provider = new GoogleAuthProvider();
-      try {
-        const result = await signInWithPopup(auth, provider);
-        alert("Eingeloggt als: " + result.user.displayName);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    // UI Steuerung
-    window.showGame = (game) => {
-      document.querySelectorAll('.game-container, .wheel-container, .poker-container').forEach(el => el.classList.remove('active'));
-      document.getElementById(game).classList.add('active');
-    };
-
-    // Sounds
-    function playSound(id) {
-      document.getElementById(id).play();
-    }
-
-    // Slot-Logik
-    let points = 100;
-    let luck = 0;
-    let gamePass = false;
-
-    window.spin = () => {
-      if (points < 10) return alert("Nicht genug Punkte!");
-      points -= 10;
-      document.getElementById("points").innerText = points;
-      playSound("spinSound");
-
-      const symbols = ['🍒', '🍋', '🔔', '💎'];
-      const r1 = symbols[Math.floor(Math.random() * symbols.length)];
-      const r2 = symbols[Math.floor(Math.random() * symbols.length)];
-      const r3 = symbols[Math.floor(Math.random() * symbols.length)];
-
-      document.getElementById("reel1").innerText = r1;
-      document.getElementById("reel2").innerText = r2;
-      document.getElementById("reel3").innerText = r3;
-
-      let reward = 0;
-      if (r1 === r2 && r2 === r3) reward = 100;
-      else if (r1 === r2 || r2 === r3 || r1 === r3) reward = 30;
-
-      if (reward > 0) {
-        reward += reward * (luck / 100);
-        if (gamePass) reward *= 1.2;
-        points += reward;
-        document.getElementById("points").innerText = Math.floor(points);
-        playSound(reward >= 100 ? "jackpotSound" : "winSound");
-      }
-    };
-
-    // Shop-Logik
-    window.buyItem = (type, amount, cost) => {
-      if (points < cost) return alert("Nicht genug Punkte!");
-      points -= cost;
-      document.getElementById("points").innerText = points;
-      if (type === 'bonus') luck += amount;
-      if (type === 'pass') gamePass = true;
-      if (type === 'design') alert("Design freigeschaltet!");
-    };
-
-    // Glücksrad
-    window.spinWheel = () => {
-      const wheelPoints = document.getElementById("wheelPoints");
-      let pointsVal = parseInt(wheelPoints.innerText);
-      if (pointsVal < 10) return alert("Nicht genug Punkte!");
-      pointsVal -= 10;
-      const outcomes = ["+10 Punkte", "+50 Punkte", "Niete", "Jackpot: +100 Punkte"];
-      const result = outcomes[Math.floor(Math.random() * outcomes.length)];
-      if (result.includes("10")) pointsVal += 10;
-      if (result.includes("50")) pointsVal += 50;
-      if (result.includes("100")) pointsVal += 100;
-      wheelPoints.innerText = pointsVal;
-      document.getElementById("wheelResult").innerText = result;
-    };
-
-    // Poker
-    window.playPoker = () => {
-      const cards = ["A", "K", "Q", "J", "10"];
-      const player = cards[Math.floor(Math.random() * cards.length)];
-      const bot = cards[Math.floor(Math.random() * cards.length)];
-      document.getElementById("pokerPlayer").innerText = player;
-      document.getElementById("pokerBot").innerText = bot;
-      const result = cards.indexOf(player) < cards.indexOf(bot) ? "Du gewinnst!" : (player === bot ? "Unentschieden." : "Bot gewinnt.");
-      document.getElementById("pokerResult").innerText = result;
-    };
-  </script>
-</body>
-</html>
