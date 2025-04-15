@@ -1,134 +1,291 @@
-// Hauptkomponenten: Lobby, Game, Info, Bot, Kartentisch import React, { useState } from "react"; import { Button } from "@/components/ui/button"; import { Card, CardContent } from "@/components/ui/card"; import { motion, AnimatePresence } from "framer-motion";
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casino Spiele</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: white;
+            text-align: center;
+        }
 
-const generateLobbyCode = () => Math.random().toString(36).substring(2, 8).toUpperCase();
+        /* Navigation */
+        .navbar {
+            background-color: #000;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
 
-const sampleCards = ["♠A", "♦10", "♣7", "♥K", "♠3"];
+        .navbar a {
+            color: gold;
+            text-decoration: none;
+            font-size: 18px;
+        }
 
-export default function PokerLobbyApp() { const [lobbyCode, setLobbyCode] = useState(""); const [joinedLobby, setJoinedLobby] = useState(false); const [showInfo, setShowInfo] = useState(false); const [selectedCard, setSelectedCard] = useState(null); const [trainingMode, setTrainingMode] = useState(false); const [playedCards, setPlayedCards] = useState([]); const [showTable, setShowTable] = useState(false); const [isBotTurn, setIsBotTurn] = useState(false); const [playerPoints, setPlayerPoints] = useState(0); const [botPoints, setBotPoints] = useState(0); const [currentBotCard, setCurrentBotCard] = useState(null);
+        .navbar a:hover {
+            color: white;
+        }
 
-const createLobby = () => { const code = generateLobbyCode(); setLobbyCode(code); setJoinedLobby(true); setTrainingMode(false); };
+        /* Hauptspielbereich */
+        .game-container {
+            margin: 30px;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 15px;
+        }
 
-const joinLobby = (code) => { if (code.length === 6) { setLobbyCode(code.toUpperCase()); setJoinedLobby(true); setTrainingMode(false); } };
+        .game-container h1 {
+            font-size: 30px;
+        }
 
-const startTraining = () => { setLobbyCode("TRAINING"); setJoinedLobby(true); setTrainingMode(true); };
+        .button {
+            padding: 10px 20px;
+            background-color: gold;
+            border: none;
+            color: black;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
 
-const botMove = () => { const botCard = sampleCards[Math.floor(Math.random() * sampleCards.length)]; return botCard; };
+        .button:hover {
+            background-color: #ffcc00;
+        }
 
-const cardValue = (card) => { const value = card.slice(1); const cardMap = { J: 11, Q: 12, K: 13, A: 14 }; return cardMap[value] || parseInt(value); };
+        .slot-container, .wheel-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
 
-const playCard = (cardIndex) => { if (isBotTurn) return;
+        .slot, .wheel {
+            width: 100px;
+            height: 100px;
+            border: 2px solid gold;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+        }
 
-setSelectedCard(cardIndex);
-const playerCard = sampleCards[cardIndex];
-setIsBotTurn(true);
+        .wheel {
+            width: 150px;
+            height: 150px;
+        }
 
-setTimeout(() => {
-  const botCard = botMove();
-  setCurrentBotCard(botCard);
-  setPlayedCards((prev) => [...prev, { player: playerCard, bot: botCard }]);
+        .wheel span {
+            font-size: 25px;
+        }
 
-  const playerVal = cardValue(playerCard);
-  const botVal = cardValue(botCard);
+        /* Slot-Machine Animation */
+        .spin {
+            animation: spin 3s ease-out;
+        }
 
-  if (playerVal > botVal) setPlayerPoints((p) => p + 1);
-  else if (botVal > playerVal) setBotPoints((b) => b + 1);
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
-  setIsBotTurn(false);
-}, 1500);
+        /* Shop Section */
+        #shop {
+            background-color: #444;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
 
-};
+        #shop h2 {
+            color: gold;
+        }
 
-return ( <div className="min-h-screen bg-white p-4 flex flex-col items-center justify-center space-y-4"> {!joinedLobby ? ( <div className="space-y-2"> <Button onClick={createLobby}>Lobby erstellen</Button> <input type="text" placeholder="Lobby-Code eingeben" maxLength={6} className="border p-2 rounded" onKeyDown={(e) => e.key === "Enter" && joinLobby(e.target.value)} /> <Button variant="outline" onClick={startTraining}> Gegen Bot trainieren </Button> </div> ) : ( <div className="text-center space-y-4"> <h2 className="text-xl font-bold"> {trainingMode ? "Trainingsmodus gegen Bot" : Lobby-Code: ${lobbyCode}} </h2>
+        #shop ul {
+            list-style-type: none;
+            padding: 0;
+        }
 
-<div className="flex gap-2 items-center justify-center flex-wrap">
-        {sampleCards.map((card, index) => (
-          <AnimatePresence key={index}>
-            {selectedCard !== index && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.5 }}
-                className={`cursor-pointer transition-transform duration-200 ${
-                  isBotTurn ? "opacity-50 pointer-events-none" : ""
-                }`}
-                whileTap={{ scale: 1.2 }}
-                onClick={() => playCard(index)}
-              >
-                <Card className="w-16 h-24 flex items-center justify-center text-2xl">
-                  <CardContent>{card}</CardContent>
-                </Card>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        ))}
-        <Button variant="outline" onClick={() => setShowInfo(true)}>
-          ?
-        </Button>
-        <Button variant="outline" onClick={() => setShowTable(true)}>
-          Tisch anzeigen
-        </Button>
-      </div>
+        #shop li {
+            color: white;
+            font-size: 18px;
+            margin: 5px 0;
+        }
 
-      {selectedCard !== null && currentBotCard && (
-        <div className="text-lg mt-2">
-          Du hast {sampleCards[selectedCard]} gespielt. Der Bot spielt: {currentBotCard}
-        </div>
-      )}
+        /* Styling für Karten */
+        .card {
+            width: 80px;
+            height: 120px;
+            border: 2px solid gold;
+            border-radius: 5px;
+            background-color: #555;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+        }
 
-      <div className="text-md mt-2">
-        Punkte – Du: {playerPoints} | Bot: {botPoints}
-      </div>
-    </div>
-  )}
+    </style>
+</head>
+<body>
 
-  {showTable && (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-4 rounded shadow-lg max-w-md w-full">
-        <h2 className="text-lg font-bold mb-2">Gespielte Karten</h2>
-        {playedCards.length === 0 ? (
-          <p>Es wurden noch keine Karten gespielt.</p>
-        ) : (
-          <ul className="space-y-1">
-            {playedCards.map((round, idx) => (
-              <li key={idx} className="text-left">
-                Runde {idx + 1}: Du – {round.player} | Bot – {round.bot}
-              </li>
-            ))}
-          </ul>
-        )}
-        <Button className="mt-4" onClick={() => setShowTable(false)}>
-          Schließen
-        </Button>
-      </div>
-    </div>
-  )}
-
-  {showInfo && (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-4 rounded shadow-lg max-w-md w-full">
-        <h2 className="text-lg font-bold mb-2">Poker Regeln</h2>
-        <p className="mb-2">
-          Ziel ist es, mit fünf Karten eine möglichst starke Kombination zu bilden. Hier sind die Hände von schwach nach stark:
-        </p>
-        <ul className="text-left list-disc pl-5 space-y-1 text-sm">
-          <li><strong>High Card:</strong> Keine Kombination – höchste Karte zählt</li>
-          <li><strong>Ein Paar:</strong> Zwei gleiche Karten</li>
-          <li><strong>Zwei Paare:</strong> Zwei verschiedene Paare</li>
-          <li><strong>Drilling:</strong> Drei gleiche Karten</li>
-          <li><strong>Straße:</strong> Fünf aufeinanderfolgende Karten</li>
-          <li><strong>Flush:</strong> Fünf Karten derselben Farbe</li>
-          <li><strong>Full House:</strong> Drilling + ein Paar</li>
-          <li><strong>Vierling:</strong> Vier gleiche Karten</li>
-          <li><strong>Straight Flush:</strong> Straße + Flush gleichzeitig</li>
-          <li><strong>Royal Flush:</strong> 10 bis Ass in einer Farbe</li>
-        </ul>
-        <Button className="mt-4" onClick={() => setShowInfo(false)}>
-          Schließen
-        </Button>
-      </div>
-    </div>
-  )}
+<div class="navbar">
+    <a href="#" id="slot-machine-link">Slot Machine</a>
+    <a href="#" id="wheel-link">Glücksrad</a>
+    <a href="#" id="poker-link">Poker</a>
+    <a href="#" id="shop-link">Shop</a>
 </div>
 
-); }
+<div id="slot-machine" class="game-container">
+    <h1>Slot Machine</h1>
+    <div class="slot-container">
+        <div class="slot" id="reel1">🍒</div>
+        <div class="slot" id="reel2">🍋</div>
+        <div class="slot" id="reel3">🍇</div>
+    </div>
+    <button class="button" id="spin-btn">Drehen</button>
+    <p id="points-display">Punkte: 100</p>
+</div>
 
+<div id="wheel-game" class="game-container" style="display:none;">
+    <h1>Glücksrad</h1>
+    <div class="wheel-container">
+        <div class="wheel" id="wheel">
+            <span id="wheel-segment">🎰</span>
+        </div>
+    </div>
+    <button class="button" id="spin-wheel-btn">Drehen</button>
+    <p id="wheel-result">Gewinn: -</p>
+</div>
+
+<div id="poker-game" class="game-container" style="display:none;">
+    <h1>Poker</h1>
+    <div id="poker-cards">
+        <div class="card" id="card1">🂡</div>
+        <div class="card" id="card2">🂢</div>
+        <div class="card" id="card3">🂳</div>
+    </div>
+    <button class="button" id="swap-cards-btn">Karten Tauschen</button>
+    <p id="poker-result">Ergebnis: -</p>
+</div>
+
+<div id="shop" style="display:none;">
+    <h2>Shop</h2>
+    <ul>
+        <li>Glücksbonus (+10%) - 50 Punkte</li>
+        <li>Premium-Design freischalten - 100 Punkte</li>
+        <li>Game Pass (20% mehr Gewinne) - 200 Punkte</li>
+    </ul>
+</div>
+
+<!-- Audio -->
+<audio id="spinSound" src="media/slot-machine-3.mp3" preload="auto"></audio>
+<audio id="winSound" src="media/win-sound.mp3" preload="auto"></audio>
+<audio id="jackpotSound" src="media/jackpot-sound.mp3" preload="auto"></audio>
+
+<script>
+// Global Variable for Points
+let points = 100;
+
+// Slot Machine Spin Logic
+document.getElementById('spin-btn').addEventListener('click', () => {
+    document.getElementById('reel1').classList.add('spin');
+    document.getElementById('reel2').classList.add('spin');
+    document.getElementById('reel3').classList.add('spin');
+    playSound('spinSound');
+
+    setTimeout(() => {
+        let results = ['🍒', '🍋', '🍇', '🍉', '🍊'];
+        let random1 = results[Math.floor(Math.random() * results.length)];
+        let random2 = results[Math.floor(Math.random() * results.length)];
+        let random3 = results[Math.floor(Math.random() * results.length)];
+
+        document.getElementById('reel1').textContent = random1;
+        document.getElementById('reel2').textContent = random2;
+        document.getElementById('reel3').textContent = random3;
+
+        calculateResults(random1, random2, random3);
+    }, 3000);  // Wait for the animation to finish
+});
+
+// Sound Logic
+function playSound(id) {
+    document.getElementById(id).play();
+}
+
+function calculateResults(symbol1, symbol2, symbol3) {
+    if (symbol1 === symbol2 && symbol2 === symbol3) {
+        if (symbol1 === '🍒') {
+            points += 10;
+            playSound('winSound');
+        } else if (symbol1 === '🍇') {
+            points += 20;
+            playSound('jackpotSound');
+        }
+    }
+    document.getElementById('points-display').textContent = `Punkte: ${points}`;
+}
+
+// Glücksrad Spin Logic
+document.getElementById('spin-wheel-btn').addEventListener('click', () => {
+    const segments = ['🎰', '🍀', '💰', '🎉', '🎯'];
+    const randomSegment = segments[Math.floor(Math.random() * segments.length)];
+    document.getElementById('wheel-segment').textContent = randomSegment;
+    document.getElementById('wheel').classList.add('spin');
+    setTimeout(() => {
+        document.getElementById('wheel').classList.remove('spin');
+        document.getElementById('wheel-result').textContent = `Gewinn: ${randomSegment}`;
+    }, 3000);
+});
+
+// Poker Game - Card Swap Logic
+document.getElementById('swap-cards-btn').addEventListener('click', () => {
+    const newCards = ['🂡', '🂢', '🂳', '🃏', '🂧'];
+    document.getElementById('card1').textContent = newCards[Math.floor(Math.random() * newCards.length)];
+    document.getElementById('card2').textContent = newCards[Math.floor(Math.random() * newCards.length)];
+    document.getElementById('card3').textContent = newCards[Math.floor(Math.random() * newCards.length)];
+    document.getElementById('poker-result').textContent = `Neue Karten!`;
+});
+
+// Show and Hide Game Sections
+document.getElementById('slot-machine-link').addEventListener('click', () => {
+    document.getElementById('slot-machine').style.display = 'block';
+    document.getElementById('wheel-game').style.display = 'none';
+    document.getElementById('poker-game').style.display = 'none';
+    document.getElementById('shop').style.display = 'none';
+});
+
+document.getElementById('wheel-link').addEventListener('click', () => {
+    document.getElementById('slot-machine').style.display = 'none';
+    document.getElementById('wheel-game').style.display = 'block';
+    document.getElementById('poker-game').style.display = 'none';
+    document.getElementById('shop').style.display = 'none';
+});
+
+document.getElementById('poker-link').addEventListener('click', () => {
+    document.getElementById('slot-machine').style.display = 'none';
+    document.getElementById('wheel-game').style.display = 'none';
+    document.getElementById('poker-game').style.display = 'block';
+    document.getElementById('shop').style.display = 'none';
+});
+
+document.getElementById('shop-link').addEventListener('click', () => {
+    document.getElementById('slot-machine').style.display = 'none';
+    document.getElementById('wheel-game').style.display = 'none';
+    document.getElementById('poker-game').style.display = 'none';
+    document.getElementById('shop').style.display = 'block';
+});
+</script>
+
+</body>
+</html>
